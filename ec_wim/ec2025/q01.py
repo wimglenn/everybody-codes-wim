@@ -9,10 +9,7 @@ for part, chunks in data.items():
         i = 0
         for step in steps:
             i += step
-            if i < 0:
-                i = 0
-            if i >= N:
-                i = N - 1
+            i = max(0, min(i, N - 1))
         print(f"Part {part}:", names[i])
     if part == "2":
         print(f"Part {part}:", names[sum(steps) % N])
