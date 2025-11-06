@@ -1,6 +1,5 @@
 from ecd import data
 
-
 for part, raw in data.items():
     graph = {}
     for line in raw.splitlines():
