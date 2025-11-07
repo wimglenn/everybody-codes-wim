@@ -5,8 +5,8 @@ import sys
 import time
 from pathlib import Path
 
-from ecd._impl import get_seed
 from ecd._impl import get_keys
+from ecd._impl import get_seed
 from ecd._impl import top
 
 
