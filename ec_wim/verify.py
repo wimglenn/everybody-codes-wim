@@ -42,6 +42,7 @@ for path in sorted(here.glob("ec*/q*.py")):
     else:
         k = json.loads(cache.read_text())
     t0 = time.time()
+    print(relpath, flush=True, end="")
     proc = subprocess.run([sys.executable, path], text=True, capture_output=True)
     t = time.time() - t0
     results = {}
@@ -57,4 +58,4 @@ for path in sorted(here.glob("ec*/q*.py")):
             glyphs.append(f"{ok} {actual}")
         else:
             glyphs.append(f"{wrong} ({actual=} {expected=})")
-    print(relpath, f"{t: 5.2f}s", *glyphs)
+    print(f"{t: 6.2f}s", *glyphs)
