@@ -2,10 +2,10 @@ from ecd import data
 
 N = int(data["1"])
 n = 1
-while n*n < N:
+while n * n < N:
     n += 1
-missing = n*n - N
-width = 2*n - 1
+missing = n * n - N
+width = 2 * n - 1
 result = width * missing
 print("Part 1:", result)
 

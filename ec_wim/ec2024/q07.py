@@ -83,7 +83,7 @@ essence = {}
 for line in data["1"].splitlines():
     pk, path = line.split(":")
     path = tuple([tr[x] for x in path.split(",")])
-    essence[pk] = essence_laps((0,)*len(path), path, n=10)
+    essence[pk] = essence_laps((0,) * len(path), path, n=10)
 result = "".join(sorted(essence, key=essence.get, reverse=True))
 print(f"Part 1: {result}")
 
@@ -111,6 +111,6 @@ while paths:
     if n_minus:
         paths.append((path + (-1,), n_plus, n_minus - 1, n_equal))
     if n_equal:
-        paths.append((path + (0,), n_plus, n_minus, n_equal -1))
+        paths.append((path + (0,), n_plus, n_minus, n_equal - 1))
 result = sum(essence_laps(track, x, n=2024) > rival_score for x in candidates)
 print("Part 3:", result)
