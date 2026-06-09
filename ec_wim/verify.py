@@ -16,8 +16,8 @@ ok = "✅"
 wrong = "❌"
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-k", help="filter by substring")
-parser.add_argument("-x", help="exclude by substring")
+parser.add_argument("-k", nargs="+", help="filter by substring")
+parser.add_argument("-x", nargs="+", help="exclude by substring")
 args = parser.parse_args()
 sub = args.k
 exclude = args.x
@@ -25,9 +25,9 @@ exclude = args.x
 seed = get_seed()
 for path in sorted(here.glob("ec*/q*.py")):
     relpath = path.relative_to(here)
-    if sub is not None and sub not in str(relpath):
+    if sub and not any(x in str(relpath) for x in sub):
         continue
-    if exclude is not None and exclude in str(relpath):
+    if exclude and any(x in str(relpath) for x in exclude):
         continue
     event = int(path.parent.name[2:])
     quest = int(path.name[1:-3])
@@ -55,7 +55,7 @@ for path in sorted(here.glob("ec*/q*.py")):
         expected = k[f"answer{part}"]
         actual = results.get(f"answer{part}")
         if expected == actual:
-            glyphs.append(f"{ok} {actual}")
+            glyphs.append(f"{ok} {actual:<20}")
         else:
             glyphs.append(f"{wrong} ({actual=} {expected=})")
-    print(f"{t: 6.2f}s", *glyphs)
+    print(f"{t: 6.2f}s  ", *glyphs)
