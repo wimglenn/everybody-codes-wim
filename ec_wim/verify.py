@@ -48,7 +48,7 @@ for path in sorted(here.glob("ec*/q*.py")):
     results = {}
     for line in proc.stdout.splitlines():
         if line.startswith("Part "):
-            part, result = line[5:].split(":")
+            part, result = line[5:].split(":", maxsplit=1)
             results[f"answer{part.strip()}"] = result.strip()
     glyphs = []
     for part in "123":
