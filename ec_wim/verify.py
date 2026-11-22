@@ -17,7 +17,6 @@ here = Path(__file__).parent
 
 ok = "✅"
 wrong = "❌"
-tty = sys.stdout.isatty()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-k", nargs="+", help="filter by substring")
@@ -40,14 +39,11 @@ reset = "\x1b[0m"
 
 
 def fmt(cs):
-    """Format a duration given in integer centiseconds.
-
-    Yellow at >= 10s, red at >= 60s (only when writing to a terminal).
+    """
+    Yellow at >= 10s, red at >= 60s.
     Padding is applied before the color codes so columns stay aligned.
     """
     text = f"{cs / 100:6.2f}s"
-    if not tty:
-        return text
     if cs >= 6000:
         return f"{red}{text}{reset}"
     if cs >= 1000:
@@ -56,45 +52,31 @@ def fmt(cs):
 
 
 def run_streaming(path, relpath, k):
-    """Run one puzzle script, printing each part's result + time as it arrives."""
+    """Run one puzzle script, printing each part result and time as they arrive"""
     row = str(relpath)
     spinner = it.cycle(r"\|/-")
-    durations = {}  # part -> centiseconds (ints so the total sums exactly)
-
+    durations = {}
     t0 = time.time()
     mark = t0  # start of the part currently being solved
 
     def draw(spin=True):
-        if tty:
-            tail = f"  {next(spinner)} {fmt(round((time.time() - mark) * 100))}" if spin else ""
-            sys.stdout.write(f"\r{row}{tail}\x1b[K")
-            sys.stdout.flush()
-
-    def append(text):
-        nonlocal row
-        row += text
-        if not tty:  # no cursor tricks: just emit the new text
-            sys.stdout.write(text)
-            sys.stdout.flush()
+        tail = f"  {next(spinner)} {fmt(round((time.time() - mark) * 100))}" if spin else ""
+        print(f"\r{row}{tail}\x1b[K", end="", flush=True)
 
     def finish_part(part, result):
         """Close out a part: stamp its time and append its glyph + answer."""
-        nonlocal mark
+        nonlocal mark, row
         now = time.time()
         durations[part] = round((now - mark) * 100)
         mark = now
         expected = k[f"answer{part}"]
         if expected == result:
-            append(f"  {ok} {result:<20} {fmt(durations[part])}")
+            row += f"  {ok} {result:<20} {fmt(durations[part])}"
         else:
-            append(f"  {wrong} ({result=} {expected=}) {fmt(durations[part])}")
-
-    if not tty:
-        sys.stdout.write(row)
-        sys.stdout.flush()
+            row += f"  {wrong} ({result=} {expected=}) {fmt(durations[part])}"
 
     proc = subprocess.Popen(
-        [sys.executable, "-u", str(path)],
+        [sys.executable, "-u", path],
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -128,11 +110,9 @@ def run_streaming(path, relpath, k):
             mark = time.time()  # later missing parts start "now" -> ~0.00s
 
     total = sum(durations.values())
-    append(f"   (total {fmt(total)})")
-    if tty:
-        draw(spin=False)
-    sys.stdout.write("\n")
-    sys.stdout.flush()
+    row += f"   (total {fmt(total)})"
+    draw(spin=False)
+    print()
 
 
 seed = get_seed()
